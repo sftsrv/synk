@@ -7,7 +7,9 @@
     "build": "tsc",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "example:server": "pnpm run build && node dist/example/websocket-server.js",
+    "example:client": "pnpm run build && node dist/example/websocket-client.js"
   },
   "keywords": [],
   "author": "",
