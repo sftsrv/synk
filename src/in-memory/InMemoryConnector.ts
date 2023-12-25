@@ -24,22 +24,25 @@ export class InMemoryConnector<T extends Reference> implements Connector<T> {
   putOne(reference: T) {
     this.db.put(reference)
     const version = this.db.getVersion()
-    const resolved = this.db.getOne(reference)
-    if (!resolved) {
-      return
-    }
 
-    this.replica.put(resolved)
-    this.replica.setVersion(version)
+    const update = this.db.getAll(this.replica.getVersion())
+
+    this.replica.applyChanges({
+      version,
+      update,
+    })
   }
 
   putMany(references: T[]) {
     this.db.putMany(references)
     const version = this.db.getVersion()
-    const resolved = this.db.getAll(version)
 
-    this.replica.putMany(resolved)
-    this.replica.setVersion(version)
+    const update = this.db.getAll(this.replica.getVersion())
+
+    this.replica.applyChanges({
+      version,
+      update,
+    })
   }
 
   delete(reference: T) {

@@ -35,7 +35,7 @@ const Mutation = <T extends Reference>(T: z.ZodType<T>) =>
 
 export type Mutation<T extends Reference> = GenericInfer<typeof Mutation<T>>
 
-const WebsocketCommand = <T extends Reference>(T: z.ZodType<T>) =>
+export const WebsocketCommand = <T extends Reference>(T: z.ZodType<T>) =>
   z.object({
     /**
      * The version of the database for  client invoking the command
@@ -73,7 +73,10 @@ export class WebsocketClientConnector<T extends Reference>
   ) {
     const DataPush = Changes(T)
 
-    ws.on("open", () => (this.status = "connected"))
+    ws.on("open", () => {
+      this.status = "connected"
+      this.init()
+    })
     ws.on("close", () => (this.status = "disconnected"))
     ws.on("error", () => (this.status = "error"))
 

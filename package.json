@@ -9,7 +9,8 @@
     "test:ui": "vitest --ui",
     "tsc": "tsc",
     "example:server": "pnpm run build && node dist/example/websocket-server.js",
-    "example:client": "pnpm run build && node dist/example/websocket-client.js"
+    "example:client-produce": "pnpm run build && node dist/example/websocket-client-produce.js",
+    "example:client-watch": "pnpm run build && node dist/example/websocket-client-watch.js"
   },
   "keywords": [],
   "author": "",

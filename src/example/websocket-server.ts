@@ -1,10 +1,7 @@
 import { WebSocket, WebSocketServer } from "ws"
-import { Reference, ReferenceID, Version } from "../types"
+import { Changes, Reference, ReferenceID, Version } from "../types"
 import { InMemoryOwnedStore } from "../in-memory/InMemoryOwnedStore"
-import {
-  WebsocketCommand,
-  Changes,
-} from "../websocket/WebsocketClientConnector"
+import { WebsocketCommand } from "../websocket/WebsocketClientConnector"
 import { Data } from "./types"
 
 let connections: WebSocket[] = []
@@ -12,6 +9,13 @@ let connections: WebSocket[] = []
 const Command = WebsocketCommand(Data)
 
 const db = new InMemoryOwnedStore<Data>()
+db.put({
+  version: 0,
+  type: "user",
+  id: "initial",
+  name: "initial user",
+  age: 5,
+})
 
 const wss = new WebSocketServer({ port: 8080 }, () =>
   console.log("Server Listening")
@@ -30,6 +34,16 @@ wss.on("connection", (ws) => {
     const command = message.data
     const version = command.version
 
+    if (!command.mutate) {
+      const changes = db.getAll(version)
+      const push: Changes<Data> = {
+        version: db.getVersion(),
+        update: changes,
+      }
+      ws.send(JSON.stringify(push))
+      return
+    }
+
     for (const mutation of command.mutate || []) {
       const { command, data } = mutation
 
@@ -42,10 +56,8 @@ wss.on("connection", (ws) => {
 
     const changes = db.getAll(version)
 
-    console.log(changes)
-
     const push: Changes<Data> = {
-      data: changes,
+      update: changes,
       version: db.getVersion(),
     }
 

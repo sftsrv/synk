@@ -74,21 +74,11 @@ export interface Writable<T extends Reference> {
 }
 
 /**
- * A store that will be used for retreiving data from the underlying persistence implementation
- */
-export interface Readable<T extends Reference> {
-  getAll(fromVersion?: number): Awaitable<T>[]
-  getOne(reference: Reference): Awaitable<T | undefined>
-}
-
-/**
  * A data store that is the target of data replication. It simply stores items and does not do any
  * modification of versions
  */
 
-export interface ReplicatedStore<T extends Reference>
-  extends Writable<T>,
-    Readable<T> {
+export interface ReplicatedStore<T extends Reference> extends Writable<T> {
   setVersion(version: Version): void
 
   applyChanges(changes: Changes<T>): Awaitable<void>
@@ -97,8 +87,6 @@ export interface ReplicatedStore<T extends Reference>
 /**
  * A store that owns the underlying data and can modify or update versions or data as needed
  */
-export interface OwnedStore<T extends Reference>
-  extends Writable<T>,
-    Readable<T> {}
+export interface OwnedStore<T extends Reference> extends Writable<T> {}
 
 export type Store<T extends Reference> = OwnedStore<T> | ReplicatedStore<T>
