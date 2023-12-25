@@ -41,7 +41,8 @@ export interface Connector<T extends Reference> {
    */
   init(): void
 
-  put(reference: T): void
+  putOne(reference: T): void
+  putMany(references: T[]): void
 
   delete(reference: T): void
 }
