@@ -8,22 +8,45 @@ import {
   Writable,
 } from "../types"
 
-export type CommandType = "delete" | "put"
+import { z } from "zod"
 
-export interface Mutation<T> {
-  command: CommandType
-  data: T
-}
+type GenericInfer<Fn extends (schema: z.ZodType) => z.ZodType> = z.infer<
+  ReturnType<Fn>
+>
 
-export interface WebsocketCommand<T extends Reference> {
-  version: Version
-  mutate?: Mutation<T>[]
-}
+const Command = z.union([z.literal("delete"), z.literal("put")])
 
-export interface WebsocketPush<T extends Reference> {
-  version: Version
-  data: T[]
-}
+export type Command = z.infer<typeof Command>
+
+const Mutation = <T extends Reference>(data: z.ZodType<T>) =>
+  z.object({
+    data,
+    command: Command,
+  })
+
+export type Mutation<T extends Reference> = GenericInfer<typeof Mutation<T>>
+
+export const WebsocketCommand = <T extends Reference>(data: z.ZodType<T>) =>
+  z.object({
+    version: z.number(),
+    mutate: z.array(Mutation(data)).optional(),
+  })
+
+export type WebsocketCommand<T extends Reference> = GenericInfer<
+  typeof WebsocketCommand<T>
+>
+
+export const WebsocketPush = <T extends Reference>(data: z.ZodType<T>) =>
+  z.object({
+    version: z.number(),
+    data: z.array(data),
+  })
+
+export type WebsocketPush<T extends Reference> = GenericInfer<
+  typeof WebsocketPush<T>
+>
+
+type X = WebsocketPush<Reference & { name: string }>
 
 type Status = "disconnected" | "connected" | "error"
 
@@ -32,15 +55,22 @@ export class WebsocketConnector<T extends Reference> implements Connector<T> {
 
   constructor(
     private readonly store: ReplicatedStore<T>,
-    private readonly ws: WebSocket
+    private readonly ws: WebSocket,
+    private readonly T: z.ZodType<T>
   ) {
+    const DataPush = WebsocketPush(T)
+
     ws.on("open", () => (this.status = "connected"))
     ws.on("close", () => (this.status = "disconnected"))
     ws.on("error", () => (this.status = "error"))
 
     ws.on("message", (data) => {
-      const message = JSON.parse(data.toString()) as WebsocketPush<T>
-      this.receive(message)
+      const message = DataPush.safeParse(JSON.parse(data.toString()))
+      if (!message.success) {
+        throw message.error
+      }
+
+      this.receive(message.data)
     })
   }
 

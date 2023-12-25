@@ -5,22 +5,12 @@ import {
   WebsocketCommand,
   WebsocketPush,
 } from "../websocket/WebsocketConnector"
-
-interface User extends Reference {
-  type: "user"
-  name: string
-  age: number
-}
-
-interface Post extends Reference {
-  type: "post"
-  userId: ReferenceID
-  content: string
-}
-
-export type Data = User | Post
+import { Data } from "./types"
 
 let connections: WebSocket[] = []
+
+const Command = WebsocketCommand(Data)
+
 const db = new InMemoryOwnedStore<Data>()
 
 const wss = new WebSocketServer({ port: 8080 }, () =>
@@ -31,10 +21,16 @@ wss.on("connection", (ws) => {
   connections.push(ws)
 
   ws.on("message", (data) => {
-    const message = JSON.parse(data.toString()) as WebsocketCommand<Data>
-    const version = message.version
+    const message = Command.safeParse(JSON.parse(data.toString()))
+    if (!message.success) {
+      console.error(message.error)
+      return
+    }
 
-    for (const mutation of message.mutate || []) {
+    const command = message.data
+    const version = command.version
+
+    for (const mutation of command.mutate || []) {
       const { command, data } = mutation
 
       if (command === "delete") {

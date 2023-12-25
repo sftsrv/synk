@@ -3,13 +3,13 @@ import {
   WebsocketCommand,
   WebsocketConnector,
 } from "../websocket/WebsocketConnector"
-import { type Data } from "./websocket-server"
 import { InMemoryReplicatedStore } from "../in-memory/InMemoryReplicatedStore"
+import { Data } from "./types"
 
 const ws = new WebSocket("ws://localhost:8080")
 const db = new InMemoryReplicatedStore<Data>()
 
-const connector = new WebsocketConnector(db, ws)
+const connector = new WebsocketConnector(db, ws, Data)
 
 setInterval(() => {
   connector.putOne({
