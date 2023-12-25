@@ -6,7 +6,7 @@ import {
   Reference,
   ReplicatedStore,
   View,
-} from "./types"
+} from "../types"
 
 export class InMemoryConnector<T extends Reference> implements Connector<T> {
   constructor(

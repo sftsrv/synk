@@ -1,4 +1,4 @@
-import { Awaitable, Reference, ReplicatedStore, Version } from "./types"
+import { Awaitable, Reference, ReplicatedStore, Version } from "../types"
 
 /**
  * A basic store that persists data in a `Map`. This store is a replication target so will respect

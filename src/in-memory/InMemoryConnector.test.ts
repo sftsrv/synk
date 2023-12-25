@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest"
 import { InMemoryConnector } from "./InMemoryConnector"
 import { InMemoryOwnedStore } from "./InMemoryOwnedStore"
 import { InMemoryReplicatedStore } from "./InMemoryReplicatedStore"
-import { Reference } from "./types"
+import { Reference } from "../types"
 
 describe(InMemoryConnector, () => {
   test("Initialization synchronizes the replica store", () => {

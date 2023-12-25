@@ -1,4 +1,4 @@
-import { Awaitable, Reference, OwnedStore, Version } from "./types"
+import { Awaitable, Reference, OwnedStore, Version } from "../types"
 
 /**
  * A basic store that persists data in a `Map`. This store owns the data and will increment and

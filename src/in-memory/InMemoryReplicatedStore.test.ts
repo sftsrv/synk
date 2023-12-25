@@ -1,6 +1,6 @@
 import { test, describe, it, expect } from "vitest"
 import { InMemoryReplicatedStore } from "./InMemoryReplicatedStore"
-import { Reference } from "./types"
+import { Reference } from "../types"
 
 describe(InMemoryReplicatedStore, () => {
   test("Store Initializes to v0", () => {
