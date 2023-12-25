@@ -12,17 +12,17 @@ export interface View {
   version: Version
 }
 
-export type EntityID = string
-export type EntityHash = string
-export type EntityType = string
+export type ReferenceID = string
+export type ReferenceHash = string
+export type ReferenceType = string
 
 /**
  * A reference to an object that will be shared between participants
  */
 export interface Reference {
-  type: EntityType
-  id: EntityID
-  updatedVersion: Version
+  type: ReferenceType
+  id: ReferenceID
+  lastVersion: Version
 }
 
 /**
@@ -36,43 +36,53 @@ export interface Reference {
  */
 export interface Connector<T extends Reference> {
   /**
-   * Update store and view data
+   * Called on initialization so the connector can handle any asynchronous setup or kick off
+   * synchronization if needed
    */
-  synchronize(): void
+  init(): void
 
-  addView(view: View): void
-  removeView(view: View): void
+  put(reference: T): void
 
-  addStore(store: Writable<T>): void
-  removeStore(store: Writable<T>): void
-
-  create(entity: T): void
-
-  update(entity: T): void
-
-  delete(entity: T): void
+  delete(reference: T): void
 }
 
 /**
  * A data store that will be used for resolving and retreiving requested entities as well as persisting
- * entity updates
+ * reference updates
  */
 export interface Writable<T extends Reference> {
-  put(entity: T): Awaitable<void>
-  putMany(entities: T[]): Awaitable<void>
+  getVersion(): Awaitable<Version>
 
-  delete(id: EntityID): Awaitable<void>
+  put(reference: T): Awaitable<void>
+  putMany(references: T[]): Awaitable<void>
+
+  delete(reference: Reference): Awaitable<void>
 }
 
 /**
  * A store that will be used for retreiving data from the underlying persistence implementation
  */
 export interface Readable<T extends Reference> {
-  readAll(): Awaitable<T>[]
-  read(id: EntityID): Awaitable<T | undefined>
+  getAll(fromVersion?: number): Awaitable<T>[]
+  getOne(reference: Reference): Awaitable<T | undefined>
 }
 
 /**
- * Abstraction for a store that implements the writable and readable store interfaces
+ * A data store that is the target of data replication. It simply stores items and does not do any
+ * modification of versions
  */
-export interface Store<T extends Reference> extends Writable<T>, Readable<T> {}
+
+export interface ReplicatedStore<T extends Reference>
+  extends Writable<T>,
+    Readable<T> {
+  setVersion(version: Version): void
+}
+
+/**
+ * A store that owns the underlying data and can modify or update versions or data as needed
+ */
+export interface OwnedStore<T extends Reference>
+  extends Writable<T>,
+    Readable<T> {}
+
+export type Store<T extends Reference> = OwnedStore<T> | ReplicatedStore<T>
