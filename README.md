@@ -13,6 +13,16 @@ A library for developing offline-first web applications based on async data repl
 - [ ] IndexedDB replication on browser
 - [ ] Testing methodology for websocket implementation
 
+## Usage
+
+For usage take a look at the `src/examples` directory which has examples for:
+
+1. A server
+2. A client that produces data
+3. A client that watches and receives and applies changes
+
+> Running any client example requires the server to also be running, the relevant commands for running the examples can be found in the `package.json` file
+
 ## References
 
 - https://ics.uci.edu/~cs230/lectures20/distrsyslectureset2-win20.pdf
