@@ -5,13 +5,17 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
     "tsc": "tsc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@vitest/ui": "^1.1.0",
     "typescript": "^5.3.3",
-    "vitest": "^1.1.0"
+    "vitest": "^1.1.0",
+    "zod": "^3.22.4"
   }
 }
