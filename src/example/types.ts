@@ -1,12 +1,6 @@
 import { z } from "zod"
 import { Reference, ReferenceID } from "../types"
 
-const Reference = z.object({
-  id: z.string(),
-  lastVersion: z.number(),
-  type: z.string(),
-})
-
 export const User = Reference.extend({
   type: z.literal("user"),
   name: z.string(),

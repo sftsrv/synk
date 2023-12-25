@@ -3,8 +3,8 @@ import { Reference, ReferenceID, Version } from "../types"
 import { InMemoryOwnedStore } from "../in-memory/InMemoryOwnedStore"
 import {
   WebsocketCommand,
-  WebsocketPush,
-} from "../websocket/WebsocketConnector"
+  Changes,
+} from "../websocket/WebsocketClientConnector"
 import { Data } from "./types"
 
 let connections: WebSocket[] = []
@@ -44,7 +44,7 @@ wss.on("connection", (ws) => {
 
     console.log(changes)
 
-    const push: WebsocketPush<Data> = {
+    const push: Changes<Data> = {
       data: changes,
       version: db.getVersion(),
     }

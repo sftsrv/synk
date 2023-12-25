@@ -1,4 +1,13 @@
+import { z } from "zod"
+
 export type Awaitable<T> = Promise<T> | T
+
+/**
+ * Infer the type of a function that returns a Zod schema
+ */
+export type GenericInfer<Fn extends (schema: z.ZodType) => z.ZodType> = z.infer<
+  ReturnType<Fn>
+>
 
 export type Version = number
 
@@ -12,18 +21,18 @@ export interface View {
   version: Version
 }
 
-export type ReferenceID = string
-export type ReferenceHash = string
-export type ReferenceType = string
-
 /**
  * A reference to an object that will be shared between participants
  */
-export interface Reference {
-  type: ReferenceType
-  id: ReferenceID
-  lastVersion: Version
-}
+export const Reference = z.object({
+  id: z.string(),
+  version: z.number(),
+  type: z.string(),
+})
+
+export type Reference = z.infer<typeof Reference>
+export type ReferenceID = Reference["id"]
+export type ReferenceType = Reference["version"]
 
 /**
  * Used for connecting stores to a network layer. Allows for using multiple stores
@@ -47,17 +56,21 @@ export interface Connector<T extends Reference> {
   delete(reference: T): void
 }
 
+export const Changes = <T extends Reference>(T: z.ZodType<T>) =>
+  z.object({
+    version: z.number(),
+    update: z.array(T).optional(),
+    delete: z.array(Reference).optional(),
+  })
+
+export type Changes<T extends Reference> = GenericInfer<typeof Changes<T>>
+
 /**
  * A data store that will be used for resolving and retreiving requested entities as well as persisting
  * reference updates
  */
 export interface Writable<T extends Reference> {
   getVersion(): Awaitable<Version>
-
-  put(reference: T): Awaitable<void>
-  putMany(references: T[]): Awaitable<void>
-
-  delete(reference: Reference): Awaitable<void>
 }
 
 /**
@@ -77,6 +90,8 @@ export interface ReplicatedStore<T extends Reference>
   extends Writable<T>,
     Readable<T> {
   setVersion(version: Version): void
+
+  applyChanges(changes: Changes<T>): Awaitable<void>
 }
 
 /**

@@ -12,12 +12,12 @@ describe(InMemoryConnector, () => {
     const entities: Reference[] = [
       {
         id: "1",
-        lastVersion: 0,
+        version: 0,
         type: "data",
       },
       {
         id: "2",
-        lastVersion: 0,
+        version: 0,
         type: "data",
       },
     ]
@@ -43,12 +43,12 @@ describe(InMemoryConnector, () => {
     const entities: Reference[] = [
       {
         id: "1",
-        lastVersion: 0,
+        version: 0,
         type: "data",
       },
       {
         id: "2",
-        lastVersion: 0,
+        version: 0,
         type: "data",
       },
     ]
@@ -62,13 +62,13 @@ describe(InMemoryConnector, () => {
       [
         {
           "id": "1",
-          "lastVersion": 1,
           "type": "data",
+          "version": 1,
         },
         {
           "id": "2",
-          "lastVersion": 1,
           "type": "data",
+          "version": 1,
         },
       ]
     `)

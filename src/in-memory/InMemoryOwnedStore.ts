@@ -1,4 +1,4 @@
-import { Awaitable, Reference, OwnedStore, Version } from "../types"
+import { Awaitable, Reference, OwnedStore, Version, Changes } from "../types"
 
 /**
  * A basic store that persists data in a `Map`. This store owns the data and will increment and
@@ -23,10 +23,9 @@ export class InMemoryOwnedStore<T extends Reference> implements OwnedStore<T> {
 
   put(reference: T) {
     this.incrementVersion()
-
     this.db.set(InMemoryOwnedStore.toKey(reference), {
       ...reference,
-      lastVersion: this.version,
+      version: this.version,
     })
   }
 
@@ -36,14 +35,14 @@ export class InMemoryOwnedStore<T extends Reference> implements OwnedStore<T> {
     references.forEach((reference) =>
       this.db.set(InMemoryOwnedStore.toKey(reference), {
         ...reference,
-        lastVersion: this.version,
+        version: this.version,
       })
     )
   }
 
   getAll(fromVersion = 0) {
     return Array.from(this.db.values()).filter(
-      (val) => val.lastVersion >= fromVersion
+      (val) => val.version >= fromVersion
     )
   }
 
@@ -54,5 +53,11 @@ export class InMemoryOwnedStore<T extends Reference> implements OwnedStore<T> {
   delete(reference: Reference) {
     this.incrementVersion()
     this.db.delete(InMemoryOwnedStore.toKey(reference))
+  }
+
+  deleteMany(references: Reference[]) {
+    this.incrementVersion()
+    const keys = references.map(InMemoryOwnedStore.toKey)
+    keys.forEach(this.db.delete)
   }
 }

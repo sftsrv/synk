@@ -18,14 +18,14 @@ describe(InMemoryReplicatedStore, () => {
     const entity: Reference = {
       id: "id",
       type: "data",
-      lastVersion: 0,
+      version: 0,
     }
 
     store.put(entity)
     const saved = store.getOne(entity)
 
     expect(store.getVersion()).toEqual(0)
-    expect(saved?.lastVersion).toEqual(0)
+    expect(saved?.version).toEqual(0)
     expect(entity).toEqual(saved)
   })
 

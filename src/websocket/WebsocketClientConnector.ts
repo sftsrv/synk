@@ -1,6 +1,8 @@
 import { WebSocket } from "ws"
 import {
+  Changes,
   Connector,
+  GenericInfer,
   Reference,
   ReplicatedStore,
   Store,
@@ -10,55 +12,66 @@ import {
 
 import { z } from "zod"
 
-type GenericInfer<Fn extends (schema: z.ZodType) => z.ZodType> = z.infer<
-  ReturnType<Fn>
->
-
 const Command = z.union([z.literal("delete"), z.literal("put")])
 
 export type Command = z.infer<typeof Command>
 
-const Mutation = <T extends Reference>(data: z.ZodType<T>) =>
+/**
+ *
+ * @param T
+ * @returns
+ */
+const Mutation = <T extends Reference>(T: z.ZodType<T>) =>
   z.object({
-    data,
+    /**
+     * The data/payload assocaited with the mutation
+     */
+    data: T,
+    /**
+     * The operation to be handled by this mutation
+     */
     command: Command,
   })
 
 export type Mutation<T extends Reference> = GenericInfer<typeof Mutation<T>>
 
-export const WebsocketCommand = <T extends Reference>(data: z.ZodType<T>) =>
+const WebsocketCommand = <T extends Reference>(T: z.ZodType<T>) =>
   z.object({
+    /**
+     * The version of the database for  client invoking the command
+     */
     version: z.number(),
-    mutate: z.array(Mutation(data)).optional(),
+    /**
+     * List of mutations to send to the client. If no mutations are sent then the command will
+     * only synchronize data
+     */
+    mutate: z.array(Mutation(T)).optional(),
   })
 
+/**
+ * Command to be sent to the server
+ */
 export type WebsocketCommand<T extends Reference> = GenericInfer<
   typeof WebsocketCommand<T>
 >
 
-export const WebsocketPush = <T extends Reference>(data: z.ZodType<T>) =>
-  z.object({
-    version: z.number(),
-    data: z.array(data),
-  })
-
-export type WebsocketPush<T extends Reference> = GenericInfer<
-  typeof WebsocketPush<T>
->
-
-type X = WebsocketPush<Reference & { name: string }>
-
 type Status = "disconnected" | "connected" | "error"
 
-export class WebsocketConnector<T extends Reference> implements Connector<T> {
+/**
+ * Uses a websocket to replicate changes between the client and the server. This implements the
+ * sending of commands to the server and handles push commands received from the server
+ */
+export class WebsocketClientConnector<T extends Reference>
+  implements Connector<T>
+{
   private status: Status = "disconnected"
 
   constructor(
     private readonly store: ReplicatedStore<T>,
     private readonly ws: WebSocket,
-    private readonly T: z.ZodType<T>
+    private readonly T: z.ZodType<T> = z.any()
   ) {
-    const DataPush = WebsocketPush(T)
+    const DataPush = Changes(T)
 
     ws.on("open", () => (this.status = "connected"))
     ws.on("close", () => (this.status = "disconnected"))
@@ -85,9 +98,8 @@ export class WebsocketConnector<T extends Reference> implements Connector<T> {
     this.ws.send(JSON.stringify(command))
   }
 
-  private receive(push: WebsocketPush<T>) {
-    console.log("Received changes", push)
-    this.store.putMany(push.data)
+  private receive(push: Changes<T>) {
+    this.store.applyChanges(push)
     this.store.setVersion(push.version)
   }
 

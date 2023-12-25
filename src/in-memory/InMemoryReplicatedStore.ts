@@ -1,4 +1,10 @@
-import { Awaitable, Reference, ReplicatedStore, Version } from "../types"
+import {
+  Awaitable,
+  Changes,
+  Reference,
+  ReplicatedStore,
+  Version,
+} from "../types"
 
 /**
  * A basic store that persists data in a `Map`. This store is a replication target so will respect
@@ -34,7 +40,7 @@ export class InMemoryReplicatedStore<T extends Reference>
 
   getAll(fromVersion = 0) {
     return Array.from(this.db.values()).filter(
-      (val) => val.lastVersion >= fromVersion
+      (val) => val.version >= fromVersion
     )
   }
 
@@ -44,5 +50,16 @@ export class InMemoryReplicatedStore<T extends Reference>
 
   delete(reference: Reference) {
     this.db.delete(InMemoryReplicatedStore.toKey(reference))
+  }
+
+  deleteMany(references: Reference[]) {
+    const keys = references.map(InMemoryReplicatedStore.toKey)
+    keys.forEach(this.db.delete)
+  }
+
+  applyChanges(changes: Changes<T>): Awaitable<void> {
+    this.putMany(changes.update || [])
+    this.deleteMany(changes.delete || [])
+    this.setVersion(changes.version)
   }
 }

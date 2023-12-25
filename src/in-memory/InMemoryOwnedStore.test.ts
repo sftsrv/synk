@@ -19,19 +19,19 @@ describe(InMemoryOwnedStore, () => {
     const entity: Reference = {
       id: "id",
       type: "data",
-      lastVersion: 0,
+      version: 0,
     }
 
     store.put(entity)
     const saved = store.getOne(entity)
 
     expect(store.getVersion()).toEqual(1)
-    expect(saved?.lastVersion).toEqual(1)
+    expect(saved?.version).toEqual(1)
     expect(saved).toMatchInlineSnapshot(`
       {
         "id": "id",
-        "lastVersion": 1,
         "type": "data",
+        "version": 1,
       }
     `)
   })
@@ -43,12 +43,12 @@ describe(InMemoryOwnedStore, () => {
       {
         id: "1",
         type: "data",
-        lastVersion: 0,
+        version: 0,
       },
       {
         id: "2",
         type: "data",
-        lastVersion: 0,
+        version: 0,
       },
     ]
 
@@ -57,18 +57,18 @@ describe(InMemoryOwnedStore, () => {
 
     expect(store.getVersion()).toEqual(1)
     expect(saved.length).toEqual(2)
-    saved?.forEach((item) => expect(item.lastVersion).toBe(1))
+    saved?.forEach((item) => expect(item.version).toBe(1))
     expect(saved).toMatchInlineSnapshot(`
       [
         {
           "id": "1",
-          "lastVersion": 1,
           "type": "data",
+          "version": 1,
         },
         {
           "id": "2",
-          "lastVersion": 1,
           "type": "data",
+          "version": 1,
         },
       ]
     `)
@@ -81,12 +81,12 @@ describe(InMemoryOwnedStore, () => {
       {
         id: "1",
         type: "data",
-        lastVersion: 0,
+        version: 0,
       },
       {
         id: "2",
         type: "data",
-        lastVersion: 0,
+        version: 0,
       },
     ]
 
@@ -97,20 +97,20 @@ describe(InMemoryOwnedStore, () => {
     expect(store.getVersion()).toEqual(2)
     expect(saved.length).toEqual(2)
 
-    expect(saved?.[0].lastVersion).toEqual(1)
-    expect(saved?.[1].lastVersion).toEqual(2)
+    expect(saved?.[0].version).toEqual(1)
+    expect(saved?.[1].version).toEqual(2)
 
     expect(saved).toMatchInlineSnapshot(`
       [
         {
           "id": "1",
-          "lastVersion": 1,
           "type": "data",
+          "version": 1,
         },
         {
           "id": "2",
-          "lastVersion": 2,
           "type": "data",
+          "version": 2,
         },
       ]
     `)
