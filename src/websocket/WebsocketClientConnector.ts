@@ -90,7 +90,11 @@ export class WebsocketClientConnector<T extends Reference>
     })
   }
 
-  async init() {
+  /**
+   * Called on initialization so the connector can handle any asynchronous setup and population of
+   * the initial store
+   */
+  private async init() {
     const version = await this.store.getVersion()
     this.send({
       version,

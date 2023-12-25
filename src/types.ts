@@ -44,12 +44,6 @@ export type ReferenceType = Reference["version"]
  * which may be dependant on the connector
  */
 export interface Connector<T extends Reference> {
-  /**
-   * Called on initialization so the connector can handle any asynchronous setup or kick off
-   * synchronization if needed
-   */
-  init(): void
-
   putOne(reference: T): void
   putMany(references: T[]): void
 
