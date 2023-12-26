@@ -1,7 +1,7 @@
 import { WebSocket, WebSocketServer } from "ws"
-import { Changes, Reference, ReferenceID, Version } from "../types"
+import { Changes } from "../types"
 import { InMemoryOwnedStore } from "../in-memory/InMemoryOwnedStore"
-import { AsyncCommand } from "../async/types"
+import { AsyncCommand, Notify } from "../async/types"
 import { Data } from "./types"
 
 let connections: WebSocket[] = []
@@ -39,6 +39,7 @@ wss.on("connection", (ws) => {
     if (!command.mutate) {
       const changes = db.getAll(version)
       const push: Changes<Data> = {
+        type: "changes",
         version: db.getVersion(),
         update: changes,
       }
@@ -58,12 +59,26 @@ wss.on("connection", (ws) => {
 
     const changes = db.getAll(version)
 
+    const newVersion = db.getVersion()
+
     const push: Changes<Data> = {
+      type: "changes",
       update: changes,
-      version: db.getVersion(),
+      version: newVersion,
     }
 
-    connections.forEach((conn) => conn.send(JSON.stringify(push)))
+    // send latest data to the client that submitted the change
+    ws.send(JSON.stringify(push))
+
+    // send a notification to all other clients that there is new data available
+    const notify: Notify = {
+      type: "notify",
+      version: newVersion,
+    }
+
+    console.log({ push, notify })
+
+    connections.forEach((conn) => conn.send(JSON.stringify(notify)))
   })
 
   ws.on("open", () => {

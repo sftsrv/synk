@@ -52,6 +52,7 @@ export interface Connector<T extends Reference> {
 
 export const Changes = <T extends Reference>(T: z.ZodType<T>) =>
   z.object({
+    type: z.literal("changes"),
     version: z.number(),
     update: z.array(T).optional(),
     delete: z.array(Reference).optional(),

@@ -2,17 +2,21 @@ import { IndexedDBStore } from "../../indexed-db/IndexedDBStore"
 import { WebsocketClientConnector } from "../../websocket/WebsocketClientConnector"
 import { Data } from "../types"
 
+const changes = document.getElementById("changes") as HTMLDivElement
+const database = document.getElementById("database") as HTMLDivElement
+const add = document.getElementById("add") as HTMLButtonElement
+const input = document.getElementById("input") as HTMLInputElement
+
 const main = async () => {
   console.log("Starting")
   const db = new IndexedDBStore("my-store")
 
   const ws = new WebSocket("ws://localhost:8080")
 
-  const connector = new WebsocketClientConnector<Data>(db, ws)
-
-  const output = document.getElementById("output")
-  const add = document.getElementById("add")
-  const input = document.getElementById("input") as HTMLInputElement
+  const connector = new WebsocketClientConnector<Data>(db, ws, async (data) => {
+    changes.innerHTML = JSON.stringify(data, null, 2)
+    database.innerHTML = JSON.stringify(await db.getAll(), null, 2)
+  })
 
   add?.addEventListener("click", async () => {
     connector.putOne({
@@ -25,8 +29,6 @@ const main = async () => {
 
     input.value = ""
   })
-
-  setTimeout(() => {}, 1000)
 }
 
 main()

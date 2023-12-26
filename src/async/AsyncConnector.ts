@@ -1,6 +1,6 @@
 import { Awaitable } from "vitest"
-import { Changes, Reference, ReplicatedStore } from "../types"
-import { AsyncCommand } from "./types"
+import { Reference, ReplicatedStore } from "../types"
+import { AsyncCommand, Push, Notify } from "./types"
 
 /**
  * A connector with decoupled sending and receiving behaviour
@@ -17,19 +17,36 @@ export abstract class AsyncConnector<T extends Reference> {
   async init() {
     await this.store.init()
     const version = await this.store.getVersion()
-    this.send({
+    await this.send({
       version,
     })
   }
 
-  receive(push: Changes<T>) {
-    console.log("Received", push)
-    this.store.applyChanges(push)
+  async receive(message: Push<T>) {
+    if (message.type === "notify") {
+      await this.requestChanges(message)
+    } else {
+      await this.store.applyChanges(message)
+    }
+  }
+
+  /**
+   * Request changes from the server if the notification version is greater than our current version
+   */
+  private async requestChanges(message: Notify) {
+    const version = await this.store.getVersion()
+    if (version === message.version) {
+      return
+    }
+
+    await this.send({
+      version,
+    })
   }
 
   async putOne(data: T) {
     const version = await this.store.getVersion()
-    this.send({
+    await this.send({
       version,
       mutate: [
         {
@@ -42,7 +59,7 @@ export abstract class AsyncConnector<T extends Reference> {
 
   async putMany(references: T[]) {
     const version = await this.store.getVersion()
-    this.send({
+    await this.send({
       version,
       mutate: references.map((data) => ({
         data,
@@ -53,7 +70,7 @@ export abstract class AsyncConnector<T extends Reference> {
 
   async delete(data: T) {
     const version = await this.store.getVersion()
-    this.send({
+    await this.send({
       version,
       mutate: [
         {

@@ -6,7 +6,7 @@ import { Data } from "./types"
 const ws = new WebSocket("ws://localhost:8080")
 const db = new InMemoryReplicatedStore<Data>()
 
-const connector = new WebsocketNodeJSClientConnector(db, ws, Data)
+const connector = new WebsocketNodeJSClientConnector(db, ws, console.log, Data)
 
 setInterval(() => {
   connector.putOne({
@@ -16,5 +16,4 @@ setInterval(() => {
     userId: "1",
     content: "some content",
   })
-  console.log("DB", db.getAll())
 }, 5000)

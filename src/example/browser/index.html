@@ -1,13 +1,23 @@
 <html>
   <head>
     <title>Demo Browser App</title>
+
+    <style>
+      h1 {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+    </style>
   </head>
 
   <body>
-    <div id="output"></div>
-
     <input type="text" id="input" />
     <button id="add">Send data</button>
+
+    <h1>Latest Change</h1>
+    <pre id="changes"></pre>
+
+    <h1>Database</h1>
+    <pre id="database"></pre>
 
     <script src="./index.ts" type="module"></script>
   </body>

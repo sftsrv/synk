@@ -3,8 +3,9 @@ import { Changes, Connector, Reference, ReplicatedStore } from "../types"
 import type WebSocket from "ws"
 
 import { z } from "zod"
-import { AsyncCommand } from "../async/types"
+import { AsyncCommand, Push } from "../async/types"
 import { AsyncConnector } from "../async/AsyncConnector"
+import { OnReceived } from "./types"
 
 /**
  * Uses a websocket to replicate changes between the client and the server. This implements the
@@ -17,11 +18,12 @@ export class WebsocketNodeJSClientConnector<T extends Reference>
   constructor(
     readonly store: ReplicatedStore<T>,
     private readonly ws: WebSocket,
+    private readonly onReceived?: OnReceived<T>,
     private readonly T: z.ZodType<T> = z.any()
   ) {
     super()
 
-    const DataPush = Changes(T)
+    const ClientMessage = Push(T)
 
     ws.on("open", () => {
       this.init()
@@ -31,12 +33,13 @@ export class WebsocketNodeJSClientConnector<T extends Reference>
     ws.on("error", console.error)
 
     ws.on("message", (data) => {
-      const message = DataPush.safeParse(JSON.parse(data.toString()))
+      const message = ClientMessage.safeParse(JSON.parse(data.toString()))
       if (!message.success) {
         throw message.error
       }
 
       this.receive(message.data)
+      this.onReceived?.(message.data)
     })
   }
 

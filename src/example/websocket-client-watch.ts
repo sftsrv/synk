@@ -6,8 +6,4 @@ import { WebsocketNodeJSClientConnector } from "../websocket/WebsocketNodeJSClie
 const ws = new WebSocket("ws://localhost:8080")
 const db = new InMemoryReplicatedStore<Data>()
 
-const connector = new WebsocketNodeJSClientConnector(db, ws, Data)
-
-setInterval(() => {
-  console.log("DB", db.getAll())
-}, 5000)
+const connector = new WebsocketNodeJSClientConnector(db, ws, console.log, Data)

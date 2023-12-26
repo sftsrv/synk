@@ -1,8 +1,9 @@
-import { Changes, Connector, Reference, ReplicatedStore } from "../types"
+import { Connector, Reference, ReplicatedStore } from "../types"
 
 import { z } from "zod"
-import { AsyncCommand } from "../async/types"
+import { AsyncCommand, Push } from "../async/types"
 import { AsyncConnector } from "../async/AsyncConnector"
+import { OnReceived } from "./types"
 
 /**
  * Uses a websocket to replicate changes between the browser and the server. This implements the
@@ -15,11 +16,12 @@ export class WebsocketClientConnector<T extends Reference>
   constructor(
     readonly store: ReplicatedStore<T>,
     private readonly ws: WebSocket,
+    private readonly onReceived?: OnReceived<T>,
     private readonly T: z.ZodType<T> = z.any()
   ) {
     super()
 
-    const DataPush = Changes(T)
+    const DataPush = Push(T)
 
     ws.onopen = () => this.init()
 
@@ -34,6 +36,7 @@ export class WebsocketClientConnector<T extends Reference>
       }
 
       this.receive(message.data)
+      this.onReceived?.(message.data)
     }
   }
 

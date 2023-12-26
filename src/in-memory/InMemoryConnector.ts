@@ -23,6 +23,7 @@ export class InMemoryConnector<T extends Reference> implements Connector<T> {
     const update = this.db.getAll(this.replica.getVersion())
 
     this.replica.applyChanges({
+      type: "changes",
       version,
       update,
     })
@@ -35,6 +36,7 @@ export class InMemoryConnector<T extends Reference> implements Connector<T> {
     const update = this.db.getAll(this.replica.getVersion())
 
     this.replica.applyChanges({
+      type: "changes",
       version,
       update,
     })
