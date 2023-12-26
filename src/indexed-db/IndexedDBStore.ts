@@ -16,11 +16,6 @@ function assertInitialized<T>(db?: T): asserts db is T {
   }
 }
 
-interface StoreEntry<T> {
-  key: string
-  data: T
-}
-
 /**
  * An instance of an IndexedDB backed store. When creating an instance the store needs to be
  * initialized. This will be handled by the connector if needed
@@ -75,9 +70,7 @@ export class IndexedDBStore<T extends Reference> implements ReplicatedStore<T> {
         }
 
         upgradeTransaction.db.createObjectStore(this.versionStoreName)
-        upgradeTransaction.db.createObjectStore(this.dataStoreName, {
-          keyPath: "key",
-        })
+        upgradeTransaction.db.createObjectStore(this.dataStoreName)
 
         upgradeTransaction.oncomplete = () => resolve()
 
@@ -116,12 +109,8 @@ export class IndexedDBStore<T extends Reference> implements ReplicatedStore<T> {
 
   toStoreData(data: T) {
     const key = this.toKey(data)
-    const entry: StoreEntry<T> = {
-      key,
-      data,
-    }
 
-    return entry
+    return [key, data] as const
   }
 
   applyChanges(changes: Changes<T>): Awaitable<void> {
@@ -142,9 +131,9 @@ export class IndexedDBStore<T extends Reference> implements ReplicatedStore<T> {
       const deletes = changes.delete || []
 
       updates.forEach((data) => {
-        const entry = this.toStoreData(data)
+        const [key, entry] = this.toStoreData(data)
         // The data store uses inline keys so a key should not be provided
-        dataStore.put(entry)
+        dataStore.put(entry, key)
       })
 
       deletes.forEach((data) => {
@@ -153,6 +142,42 @@ export class IndexedDBStore<T extends Reference> implements ReplicatedStore<T> {
       })
 
       versionStore.put(changes.version, this.versionKey)
+    })
+  }
+
+  getDataStore() {
+    assertInitialized(this.db)
+    const transaction = this.db.transaction([this.dataStoreName], "readonly")
+    const store = transaction.objectStore(this.dataStoreName)
+
+    return store
+  }
+
+  getAll(): Promise<T[]> {
+    const store = this.getDataStore()
+
+    return new Promise((resolve, reject) => {
+      const request = store.getAll()
+
+      request.onerror = reject
+      request.onsuccess = () => {
+        const data = request.result as T[]
+        resolve(data)
+      }
+    })
+  }
+
+  getOne(reference: Reference): Promise<T | undefined> {
+    const store = this.getDataStore()
+
+    return new Promise((resolve, reject) => {
+      const request = store.get(this.toKey(reference))
+
+      request.onerror = reject
+      request.onsuccess = () => {
+        const data = request.result as T | undefined
+        resolve(data)
+      }
     })
   }
 }
