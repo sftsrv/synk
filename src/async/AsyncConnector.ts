@@ -1,6 +1,6 @@
 import { Awaitable } from "vitest"
-import { Reference, ReplicatedStore } from "../types"
-import { AsyncCommand, Push, Notify } from "./types"
+import { Changes, Reference, ReplicatedStore } from "../types"
+import { Push, Notify } from "./types"
 
 /**
  * A connector with decoupled sending and receiving behaviour
@@ -8,7 +8,7 @@ import { AsyncCommand, Push, Notify } from "./types"
 export abstract class AsyncConnector<T extends Reference> {
   abstract store: ReplicatedStore<T>
 
-  abstract send(command: AsyncCommand<T>): Awaitable<void>
+  abstract send(changes: Changes<T>): Awaitable<void>
 
   /**
    * Called on initialization so the connector can handle any asynchronous setup and population of
@@ -18,6 +18,7 @@ export abstract class AsyncConnector<T extends Reference> {
     await this.store.init()
     const version = await this.store.getVersion()
     await this.send({
+      type: "changes",
       version,
     })
   }
@@ -40,6 +41,7 @@ export abstract class AsyncConnector<T extends Reference> {
     }
 
     await this.send({
+      type: "changes",
       version,
     })
   }
@@ -47,37 +49,27 @@ export abstract class AsyncConnector<T extends Reference> {
   async putOne(data: T) {
     const version = await this.store.getVersion()
     await this.send({
+      type: "changes",
       version,
-      mutate: [
-        {
-          data,
-          command: "put",
-        },
-      ],
+      update: [data],
     })
   }
 
   async putMany(references: T[]) {
     const version = await this.store.getVersion()
     await this.send({
+      type: "changes",
       version,
-      mutate: references.map((data) => ({
-        data,
-        command: "delete",
-      })),
+      update: references,
     })
   }
 
   async delete(data: T) {
     const version = await this.store.getVersion()
     await this.send({
+      type: "changes",
       version,
-      mutate: [
-        {
-          data,
-          command: "delete",
-        },
-      ],
+      delete: [data],
     })
   }
 }

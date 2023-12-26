@@ -14,8 +14,10 @@ const main = async () => {
   const ws = new WebSocket("ws://localhost:8080")
 
   const connector = new WebsocketClientConnector<Data>(db, ws, async (data) => {
+    const version = await db.getVersion()
+    const store = await db.getAll()
     changes.innerHTML = JSON.stringify(data, null, 2)
-    database.innerHTML = JSON.stringify(await db.getAll(), null, 2)
+    database.innerHTML = JSON.stringify({ version, store }, null, 2)
   })
 
   add?.addEventListener("click", async () => {

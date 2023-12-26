@@ -60,12 +60,21 @@ export const Changes = <T extends Reference>(T: z.ZodType<T>) =>
 
 export type Changes<T extends Reference> = GenericInfer<typeof Changes<T>>
 
+const Command = z.union([z.literal("delete"), z.literal("put")])
+
+export type Command = z.infer<typeof Command>
+
 /**
  * A data store that will be used for resolving and retreiving requested entities as well as persisting
  * reference updates
  */
 export interface Writable<T extends Reference> {
   getVersion(): Awaitable<Version>
+
+  /**
+   * Apply changes received and the new version
+   */
+  applyChanges(changes: Changes<T>): Awaitable<void>
 }
 
 /**
@@ -78,15 +87,16 @@ export interface ReplicatedStore<T extends Reference> extends Writable<T> {
    * consumers do not need to manage the lifecycle of the store
    */
   init(): Awaitable<void>
-  /**
-   * Apply changes received and the new version
-   */
-  applyChanges(changes: Changes<T>): Awaitable<void>
 }
 
 /**
  * A store that owns the underlying data and can modify or update versions or data as needed
  */
-export interface OwnedStore<T extends Reference> extends Writable<T> {}
+export interface OwnedStore<T extends Reference> extends Writable<T> {
+  /**
+   * Get database changes relative to a version
+   */
+  getChanges(fromVersion?: Version): Changes<T>
+}
 
 export type Store<T extends Reference> = OwnedStore<T> | ReplicatedStore<T>

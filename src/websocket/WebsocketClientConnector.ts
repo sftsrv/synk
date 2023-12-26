@@ -1,7 +1,7 @@
-import { Connector, Reference, ReplicatedStore } from "../types"
+import { Changes, Connector, Reference, ReplicatedStore } from "../types"
 
 import { z } from "zod"
-import { AsyncCommand, Push } from "../async/types"
+import { Push } from "../async/types"
 import { AsyncConnector } from "../async/AsyncConnector"
 import { OnReceived } from "./types"
 
@@ -40,7 +40,7 @@ export class WebsocketClientConnector<T extends Reference>
     }
   }
 
-  send(command: AsyncCommand<T>) {
+  send(command: Changes<T>) {
     this.ws.send(JSON.stringify(command))
   }
 }
