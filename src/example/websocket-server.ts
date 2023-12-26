@@ -39,6 +39,8 @@ wss.on("connection", (ws) => {
     const changes = db.getChanges(command.version)
     const newVersion = db.getVersion()
 
+    console.log("changes to client", changes)
+
     // send latest data to the client that submitted the change
     ws.send(JSON.stringify(changes))
 

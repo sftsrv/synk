@@ -5,11 +5,12 @@ import { Data } from "../types"
 const changes = document.getElementById("changes") as HTMLDivElement
 const database = document.getElementById("database") as HTMLDivElement
 const add = document.getElementById("add") as HTMLButtonElement
+const dlt = document.getElementById("delete") as HTMLButtonElement
 const input = document.getElementById("input") as HTMLInputElement
 
 const main = async () => {
   console.log("Starting")
-  const db = new IndexedDBStore("my-store")
+  const db = new IndexedDBStore<Data>("my-store")
 
   const ws = new WebSocket("ws://localhost:8080")
 
@@ -20,7 +21,7 @@ const main = async () => {
     database.innerHTML = JSON.stringify({ version, store }, null, 2)
   })
 
-  add?.addEventListener("click", async () => {
+  add.addEventListener("click", async () => {
     connector.putOne({
       version: await db.getVersion(),
       type: "user",
@@ -30,6 +31,17 @@ const main = async () => {
     })
 
     input.value = ""
+  })
+
+  dlt.addEventListener("click", async () => {
+    const data = await db.getAll()
+    const first = await data[0]
+
+    if (!first) {
+      return
+    }
+
+    await connector.delete(first)
   })
 }
 

@@ -27,12 +27,13 @@ export class InMemoryOwnedStore<T extends Reference> implements OwnedStore<T> {
       this.putMany(changes.update || [])
     }
 
-    if (changes.update?.length) {
+    if (changes.delete?.length) {
       this.deleteMany(changes.delete || [])
     }
   }
 
   getChanges(fromVersion?: number | undefined): Changes<T> {
+    console.log({ deletes: this.getDeletes() })
     return {
       type: "changes",
       version: this.getVersion(),
