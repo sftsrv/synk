@@ -1,59 +1,8 @@
 import { WebSocket } from "ws"
-import {
-  Changes,
-  Connector,
-  GenericInfer,
-  Reference,
-  ReplicatedStore,
-  Store,
-  Version,
-  Writable,
-} from "../types"
+import { Changes, Connector, Reference, ReplicatedStore } from "../types"
 
 import { z } from "zod"
-
-const Command = z.union([z.literal("delete"), z.literal("put")])
-
-export type Command = z.infer<typeof Command>
-
-/**
- *
- * @param T
- * @returns
- */
-const Mutation = <T extends Reference>(T: z.ZodType<T>) =>
-  z.object({
-    /**
-     * The data/payload assocaited with the mutation
-     */
-    data: T,
-    /**
-     * The operation to be handled by this mutation
-     */
-    command: Command,
-  })
-
-export type Mutation<T extends Reference> = GenericInfer<typeof Mutation<T>>
-
-export const WebsocketCommand = <T extends Reference>(T: z.ZodType<T>) =>
-  z.object({
-    /**
-     * The version of the database for  client invoking the command
-     */
-    version: z.number(),
-    /**
-     * List of mutations to send to the client. If no mutations are sent then the command will
-     * only synchronize data
-     */
-    mutate: z.array(Mutation(T)).optional(),
-  })
-
-/**
- * Command to be sent to the server
- */
-export type WebsocketCommand<T extends Reference> = GenericInfer<
-  typeof WebsocketCommand<T>
->
+import { WebsocketCommand } from "./types"
 
 type Status = "disconnected" | "connected" | "error"
 
@@ -77,6 +26,7 @@ export class WebsocketClientConnector<T extends Reference>
       this.status = "connected"
       this.init()
     })
+
     ws.on("close", () => (this.status = "disconnected"))
     ws.on("error", () => (this.status = "error"))
 
@@ -95,6 +45,7 @@ export class WebsocketClientConnector<T extends Reference>
    * the initial store
    */
   private async init() {
+    await this.store.init()
     const version = await this.store.getVersion()
     this.send({
       version,

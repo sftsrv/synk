@@ -1,7 +1,7 @@
 import { WebSocket, WebSocketServer } from "ws"
 import { Changes, Reference, ReferenceID, Version } from "../types"
 import { InMemoryOwnedStore } from "../in-memory/InMemoryOwnedStore"
-import { WebsocketCommand } from "../websocket/WebsocketClientConnector"
+import { WebsocketCommand } from "../websocket/types"
 import { Data } from "./types"
 
 let connections: WebSocket[] = []

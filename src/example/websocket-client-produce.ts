@@ -1,8 +1,5 @@
 import WebSocket from "ws"
-import {
-  WebsocketCommand,
-  WebsocketClientConnector,
-} from "../websocket/WebsocketClientConnector"
+import { WebsocketClientConnector } from "../websocket/WebsocketClientConnector"
 import { InMemoryReplicatedStore } from "../in-memory/InMemoryReplicatedStore"
 import { Data } from "./types"
 

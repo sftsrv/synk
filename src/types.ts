@@ -71,10 +71,12 @@ export interface Writable<T extends Reference> {
  * A data store that is the target of data replication. It simply stores items and does not do any
  * modification of versions
  */
-
 export interface ReplicatedStore<T extends Reference> extends Writable<T> {
-  setVersion(version: Version): void
-
+  /**
+   * Used so that connectors can initialize the store as part of their own setup sequence so that
+   * consumers do not need to manage the lifecycle of the store
+   */
+  init(): Awaitable<void>
   applyChanges(changes: Changes<T>): Awaitable<void>
 }
 

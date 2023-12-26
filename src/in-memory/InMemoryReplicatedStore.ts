@@ -20,6 +20,8 @@ export class InMemoryReplicatedStore<T extends Reference>
     return `${reference.type}::${reference.id}`
   }
 
+  init() {}
+
   getVersion() {
     return this.version
   }

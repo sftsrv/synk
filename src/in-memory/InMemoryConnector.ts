@@ -1,12 +1,6 @@
 import { InMemoryOwnedStore } from "./InMemoryOwnedStore"
 import { InMemoryReplicatedStore } from "./InMemoryReplicatedStore"
-import {
-  Connector,
-  OwnedStore,
-  Reference,
-  ReplicatedStore,
-  View,
-} from "../types"
+import { Connector, Reference } from "../types"
 
 export class InMemoryConnector<T extends Reference> implements Connector<T> {
   constructor(
@@ -15,6 +9,7 @@ export class InMemoryConnector<T extends Reference> implements Connector<T> {
   ) {}
 
   init() {
+    this.replica.init()
     const replicaVersion = this.replica.getVersion()
     const data = this.db.getAll(replicaVersion)
 
