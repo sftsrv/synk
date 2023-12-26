@@ -21,7 +21,7 @@ function assertInitialized<T>(db?: T): asserts db is T {
  * initialized. This will be handled by the connector if needed
  */
 export class IndexedDBStore<T extends Reference> implements ReplicatedStore<T> {
-  db?: IDBDatabase
+  private db?: IDBDatabase
 
   private readonly versionStoreName = "version"
   private readonly dataStoreName = "data"
@@ -79,7 +79,7 @@ export class IndexedDBStore<T extends Reference> implements ReplicatedStore<T> {
     })
   }
 
-  getVersionStore(mode?: IDBTransactionMode) {
+  private getVersionStore(mode?: IDBTransactionMode) {
     assertInitialized(this.db)
 
     const transaction = this.db.transaction([this.versionStoreName], mode)
@@ -103,11 +103,11 @@ export class IndexedDBStore<T extends Reference> implements ReplicatedStore<T> {
     })
   }
 
-  toKey(data: Reference) {
+  private toKey(data: Reference) {
     return `${data.type}::${data.id}`
   }
 
-  toStoreData(data: T) {
+  private toStoreData(data: T) {
     const key = this.toKey(data)
 
     return [key, data] as const
@@ -145,7 +145,7 @@ export class IndexedDBStore<T extends Reference> implements ReplicatedStore<T> {
     })
   }
 
-  getDataStore() {
+  private getDataStore() {
     assertInitialized(this.db)
     const transaction = this.db.transaction([this.dataStoreName], "readonly")
     const store = transaction.objectStore(this.dataStoreName)
