@@ -121,7 +121,7 @@ export class IndexedDBStore<T extends Reference> implements ReplicatedStore<T> {
       data,
     }
 
-    return [key, entry] as const
+    return entry
   }
 
   applyChanges(changes: Changes<T>): Awaitable<void> {
@@ -142,8 +142,9 @@ export class IndexedDBStore<T extends Reference> implements ReplicatedStore<T> {
       const deletes = changes.delete || []
 
       updates.forEach((data) => {
-        const [key, entry] = this.toStoreData(data)
-        dataStore.put(entry, key)
+        const entry = this.toStoreData(data)
+        // The data store uses inline keys so a key should not be provided
+        dataStore.put(entry)
       })
 
       deletes.forEach((data) => {

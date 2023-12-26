@@ -26,8 +26,9 @@ export class WebsocketClientConnector<T extends Reference>
     ws.onclose = console.log
     ws.onerror = console.error
 
-    ws.onmessage = (data) => {
-      const message = DataPush.safeParse(JSON.parse(data.toString()))
+    ws.onmessage = (payload) => {
+      const data = payload.data
+      const message = DataPush.safeParse(JSON.parse(data))
       if (!message.success) {
         throw message.error
       }
