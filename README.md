@@ -17,13 +17,14 @@ A library for developing offline-first web applications based on async data repl
 - [ ] More sophisticated merge handling (CRDT?)
 - [ ] Method for initial sync and cleanup of bad entries
 
-## Usage
+## Examples
 
 For usage take a look at the `src/examples` directory which has examples for:
 
-1. A server
-2. A client that produces data
-3. A client that watches and receives and applies changes
+1. `src/example/websocket-server` - A Node.js erver using an in-memory db and the websocket interfaces
+2. `src/example/websocket-client-produce` - A Node.js client using the `WebsocketNodeJSConnector` that produces and replicates data from the server
+3. `src/example/websocket-client-watch` - A Node.js client using the `WebsocketNodeJSConnector` that replicates data from the server
+4. `src/example/browser` - Browser app using the `IndexedDBStore` and `WebsocketClientConnector`
 
 > Running any client example requires the server to also be running, the relevant commands for running the examples can be found in the `package.json` file
 
