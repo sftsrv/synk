@@ -25,7 +25,7 @@ const Mutation = <T extends Reference>(T: z.ZodType<T>) =>
 
 export type Mutation<T extends Reference> = GenericInfer<typeof Mutation<T>>
 
-export const WebsocketCommand = <T extends Reference>(T: z.ZodType<T>) =>
+export const AsyncCommand = <T extends Reference>(T: z.ZodType<T>) =>
   z.object({
     /**
      * The version of the database for  client invoking the command
@@ -41,6 +41,6 @@ export const WebsocketCommand = <T extends Reference>(T: z.ZodType<T>) =>
 /**
  * Command to be sent to the server
  */
-export type WebsocketCommand<T extends Reference> = GenericInfer<
-  typeof WebsocketCommand<T>
+export type AsyncCommand<T extends Reference> = GenericInfer<
+  typeof AsyncCommand<T>
 >

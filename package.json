@@ -8,12 +8,12 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "tsc": "tsc",
+    "tsup": "tsup",
+    "parcel": "parcel",
     "example:server": "pnpm run build && node dist/example/websocket-server.js",
     "example:client-produce": "pnpm run build && node dist/example/websocket-client-produce.js",
     "example:client-watch": "pnpm run build && node dist/example/websocket-client-watch.js",
-    "tsup": "tsup",
-    "parcel": "parcel",
-    "example:browser": "parcel src/example/browser/index.html"
+    "example:client-browser": "parcel src/example/browser/index.html"
   },
   "keywords": [],
   "author": "",

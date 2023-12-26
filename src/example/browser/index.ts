@@ -1,18 +1,24 @@
 import { IndexedDBStore } from "../../indexed-db/IndexedDBStore"
+import { WebsocketClientConnector } from "../../websocket/WebsocketClientConnector"
+import { Data } from "../types"
 
 const main = async () => {
   console.log("Starting")
   const db = new IndexedDBStore("my-store")
-  await db.init()
 
-  console.log("Setting version")
-  await db.applyChanges({
-    version: 7,
-  })
+  const ws = new WebSocket("wss://localhost:8080")
 
-  const version = await db.getVersion()
+  const connector = new WebsocketClientConnector<Data>(db, ws)
 
-  console.log({ version })
+  setInterval(async () => {
+    connector.putOne({
+      version: await db.getVersion(),
+      type: "user",
+      id: new Date().toString(),
+      name: new Date().toString(),
+      age: Date.now(),
+    })
+  }, 5000)
 }
 
 main()

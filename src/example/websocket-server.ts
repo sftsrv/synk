@@ -1,12 +1,12 @@
 import { WebSocket, WebSocketServer } from "ws"
 import { Changes, Reference, ReferenceID, Version } from "../types"
 import { InMemoryOwnedStore } from "../in-memory/InMemoryOwnedStore"
-import { WebsocketCommand } from "../websocket/types"
+import { AsyncCommand } from "../async/types"
 import { Data } from "./types"
 
 let connections: WebSocket[] = []
 
-const Command = WebsocketCommand(Data)
+const Command = AsyncCommand(Data)
 
 const db = new InMemoryOwnedStore<Data>()
 db.put({
@@ -30,6 +30,8 @@ wss.on("connection", (ws) => {
       console.error(message.error)
       return
     }
+
+    console.log(message)
 
     const command = message.data
     const version = command.version

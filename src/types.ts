@@ -77,6 +77,9 @@ export interface ReplicatedStore<T extends Reference> extends Writable<T> {
    * consumers do not need to manage the lifecycle of the store
    */
   init(): Awaitable<void>
+  /**
+   * Apply changes received and the new version
+   */
   applyChanges(changes: Changes<T>): Awaitable<void>
 }
 
