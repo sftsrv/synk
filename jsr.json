@@ -3,13 +3,13 @@
   "name": "@sftsrv/synk",
   "version": "0.0.3",
   "exports": {
-    ".": "./src/index.ts",
-    "./in-memory": "./src/in-memory/index.ts",
-    "./async": "./src/async/index.ts",
-    "./indexed-db": "./src/indexed-db/index.ts",
-    "./websocket": "./src/websocket/index.ts"
+    ".": "./dist/index.js",
+    "./in-memory": "./dist/in-memory/index.js",
+    "./async": "./dist/async/index.js",
+    "./indexed-db": "./dist/indexed-db/index.js",
+    "./websocket": "./dist/websocket/index.js"
   },
   "publish": {
-    "exclude": ["!src"]
+    "exclude": ["!dist"]
   }
 }
