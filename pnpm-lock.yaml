@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  glob:
+    specifier: ^10.3.10
+    version: 10.3.10
   tsup:
     specifier: ^8.0.2
     version: 8.0.2(typescript@5.3.3)
