@@ -6,8 +6,8 @@ export default defineConfig({
     // After adding more Node related functionality will split into browser and node packages
     browser: {
       enabled: true,
-      headless: true,
-      name: "chrome",
+      name: "chromium",
+      provider: "playwright",
     },
   },
 })
