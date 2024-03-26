@@ -1,0 +1,11 @@
+{
+  "name": "@sftsrv/synk",
+  "version": "0.0.1",
+  "exports": {
+    ".": "./src/types.ts",
+    "./in-memory": "./src/in-memory/index.ts",
+    "./async": "./src/async/index.ts",
+    "./indexed-db": "./src/indexed-db/index.ts",
+    "./websocket": "./src/websocket/index.ts"
+  }
+}
