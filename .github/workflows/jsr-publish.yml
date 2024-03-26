@@ -4,12 +4,19 @@ on:
   push:
     branches:
       - main
+
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-20.04
+
+    permissions:
+      contents: read
+      id-token: write
+
     strategy:
       matrix:
         node-version: [20]
+
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
@@ -23,18 +30,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Install playwright
+        run: pnpm exec playwright install
+
       - name: Build
         run: pnpm build
 
-  publish:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      id-token: write
-
-    steps:
-      - uses: actions/checkout@v4
+      - name: Run tests
+        run: pnpm test
 
       - name: Publish package
         run: npx jsr publish
