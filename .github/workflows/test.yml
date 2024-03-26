@@ -28,3 +28,6 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+
+      - name: Publish package
+        run: npx jsr publish --dry-run

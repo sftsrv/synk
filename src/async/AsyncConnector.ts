@@ -1,4 +1,4 @@
-import { Awaitable } from "vitest"
+import { Awaitable } from "../types"
 import { Changes, Reference, ReplicatedStore } from "../types"
 import { Push, Notify } from "./types"
 
