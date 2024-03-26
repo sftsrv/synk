@@ -16,6 +16,7 @@ A library for developing offline-first web applications based on async data repl
 - [ ] Testing methodology for websocket implementation
 - [ ] More sophisticated merge handling (CRDT?)
 - [ ] Method for initial sync and cleanup of bad entries
+- [ ] Can we make it possible to sync to a file system, check: https://github.com/streetwriters/notesnook/tree/master/packages/streamable-fs
 
 ## Examples
 
