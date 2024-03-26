@@ -1,11 +1,15 @@
 {
+  "$schema": "https://jsr.io/schema/config-file.v1.json",
   "name": "@sftsrv/synk",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "exports": {
-    ".": "./src/types.ts",
-    "./in-memory": "./src/in-memory/index.ts",
-    "./async": "./src/async/index.ts",
-    "./indexed-db": "./src/indexed-db/index.ts",
-    "./websocket": "./src/websocket/index.ts"
+    ".": "./dist/index.ts",
+    "./in-memory": "./dist/in-memory/index.ts",
+    "./async": "./dist/async/index.ts",
+    "./indexed-db": "./dist/indexed-db/index.ts",
+    "./websocket": "./dist/websocket/index.ts"
+  },
+  "publish": {
+    "exclude": ["!dist"]
   }
 }

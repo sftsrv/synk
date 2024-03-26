@@ -1,14 +1,7 @@
 {
   "name": "@sftsv/synk",
-  "version": "0.0.2",
-  "description": "",
-  "exports": {
-    ".": "./src/types.ts",
-    "./in-memory": "./src/in-memory/index.ts",
-    "./async": "./src/async/index.ts",
-    "./indexed-db": "./src/indexed-db/index.ts",
-    "./websocket": "./src/websocket/index.ts"
-  },
+  "version": "0.0.3",
+  "description": "A library for developing offline-first web applications based on async data replication and synchronization between clients and the server",
   "scripts": {
     "build": "tsc",
     "test": "vitest",
