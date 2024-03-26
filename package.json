@@ -1,6 +1,6 @@
 {
   "name": "@sftsv/synk",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "A library for developing offline-first web applications based on async data replication and synchronization between clients and the server",
   "type": "commonjs",
   "module": "dist/index.js",
